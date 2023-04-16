@@ -1,9 +1,12 @@
-import express, { ErrorRequestHandler } from 'express'
+import express from 'express'
 import createHttpError from 'http-errors'
 import router from './routes/routes'
 import mongoose from 'mongoose'
 import { DB, PORT } from './config'
 import { errorHandler } from './middleware/errorHandler'
+import passport from 'passport'
+import Mpassport from './middleware/passport'
+import cookieParser from "cookie-parser";
 
 const app = express()
 
@@ -13,6 +16,9 @@ app.get("/", (req,res,next) => {
     })
 })
 app.use(express.json())
+app.use(passport.initialize())
+Mpassport(passport);
+app.use(cookieParser())
 app.use("/api",router);
 
 app.use(()=>{

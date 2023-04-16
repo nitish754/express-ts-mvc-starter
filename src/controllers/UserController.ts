@@ -42,11 +42,12 @@ export const Login:RequestHandler =async (req,res,next) => {
         if(!isValidPassword) return next(createHttpError(400, "Enter a valid password"))
 
         const token = jwt.sign(
-            {
-                name : user.name,
-                email : user.email,
-                userId : user._id
-            },
+            {user},
+            // {
+            //     name : user.name,
+            //     email : user.email,
+            //     id : user._id
+            // },
             JWT_KEY,
             {
                 expiresIn : "7d"
