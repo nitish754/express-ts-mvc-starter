@@ -1,31 +1,33 @@
 import express, { ErrorRequestHandler } from 'express'
 import createHttpError from 'http-errors'
+import router from './routes/routes'
+import mongoose from 'mongoose'
+import { DB, PORT } from './config'
+import { errorHandler } from './middleware/errorHandler'
 
 const app = express()
 
-app.get('/', (req,res) => {
+app.get("/", (req,res,next) => {
     res.json({
-        message : "Hello World"
+        message : "Welcome to my first Express server"
     })
 })
+app.use(express.json())
+app.use("/api",router);
 
 app.use(()=>{
     throw createHttpError(404, 'Route not found')
 })
-
-const errorHandler:ErrorRequestHandler = (err,req,res,next) => {
-    console.log(err.message, err.statusCode);
-    if(res.headersSent){
-        return next(err);
-    }
-
-    res.status(err.statusCode || 500).json({
-        message : err.message || "An Unknown Error"
-    })
-}
-
 app.use(errorHandler);
 
-app.listen(3000, () => {
-    console.log("server running on 3000");
+// connect to database 
+mongoose.connect(DB)
+.then(() => {
+    console.log("connected to Database")
+    app.listen(PORT, () => {
+        console.log(`server running on ${PORT}`);
+    })
+})
+.catch(() => {
+    throw createHttpError(501,"Unable to connect to database")
 })
